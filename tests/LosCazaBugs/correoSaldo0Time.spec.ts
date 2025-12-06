@@ -35,7 +35,7 @@ async function waitForEmailWithTiming(
         imap.end();
         const elapsed = Date.now() - startTimestamp;
         reject(new Error(
-          `Timeout: No se recibió correo en ${maxWaitMs}ms. ` +
+          `Timeout: No se recibio correo en ${maxWaitMs}ms. ` +
           `Tiempo transcurrido: ${elapsed}ms`
         ));
       }
@@ -51,7 +51,7 @@ async function waitForEmailWithTiming(
 
         // Buscar correos muy recientes
         const searchCriteria = [
-          ["SINCE", new Date(startTimestamp - 5000)], // 5 segundos antes
+          ["SINCE", new Date(startTimestamp - 5000)],
           ["SUBJECT", subject],
         ];
 
@@ -96,7 +96,7 @@ async function waitForEmailWithTiming(
 
               fetch.once("error", reject);
             } else if (Date.now() - startTimestamp < maxWaitMs) {
-              // Revisar cada 200ms para mayor precisión
+              // Revisar cada 200ms
               setTimeout(checkForEmail, 200);
             }
           });
@@ -124,7 +124,7 @@ async function waitForVisible(page: any, selector: string, timeout = 50000) {
     });
     return page.locator(selector);
   } catch (error) {
-    console.error(`❌ No se encontró: ${selector}`);
+    console.error(` No se encontro: ${selector}`);
     await page.screenshot({ path: `debug-${Date.now()}.png`, fullPage: true });
     throw new Error(
       `Timeout: El selector "${selector}" no se hizo visible en ${timeout}ms`
@@ -137,7 +137,7 @@ test.describe("Performance: Tiempo de entrega del correo", () => {
   test.setTimeout(60000); // 60 segundos máximo (aumentado para el test de consistencia)
 
   test("El correo debe llegar en 5 segundos o menos", async ({ page }) => {
-    // 1. Configuración
+    // 1. Configuration
     const emailPrueba = process.env.TEST_EMAIL!;
     const emailPassword = process.env.TEST_EMAIL_PASSWORD!;
 
@@ -145,31 +145,31 @@ test.describe("Performance: Tiempo de entrega del correo", () => {
       throw new Error("Faltan TEST_EMAIL y TEST_EMAIL_PASSWORD en .env");
     }
 
-    console.log("📧 Email de prueba:", emailPrueba);
-    console.log("⏱️  Requisito: Correo debe llegar en ≤ 5000ms\n");
+    console.log(" Email de prueba:", emailPrueba);
+    console.log("  Requisito: Correo debe llegar en ≤ 5000ms\n");
 
-    // 2. Navegar a la aplicación
-    console.log("🌐 Navegando a la aplicación...");
+    // 2. Navegar a la aplicacion
+    console.log(" Navegando a la aplicacion...");
     await page.goto("https://alquiler-front-hot4.onrender.com/", {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
     await page.waitForLoadState("networkidle");
 
-    // 3. Ir a Comisión
-    console.log("🔘 Navegando a Comisión...");
+    // 3. Ir a Comision
+    console.log(" Navegando a Comision...");
     await page.click("#btn-ir-comision", { timeout: 10000 });
     await page.waitForTimeout(1000);
 
     // 4. Ingresar usuario
-    console.log("⌨️  Ingresando usuario...");
+    console.log("  Ingresando usuario...");
     const inputUsuario = await waitForVisible(page, "#usuario", 20000);
     await inputUsuario.fill("RecodeFixer");
     await inputUsuario.press("Enter");
     await page.waitForTimeout(2500);
 
     // 5. Ir a Mi Billetera
-    console.log("💼 Accediendo a billetera...");
+    console.log(" Accediendo a billetera...");
     const walletLink = await page.waitForSelector(
       'a[href*="/bitcrew/wallet?usuario="], a:has-text("Mi Billetera")',
       { state: "visible", timeout: 20000 }
@@ -178,14 +178,14 @@ test.describe("Performance: Tiempo de entrega del correo", () => {
     await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(2000);
 
-    // 6. Abrir configuración
-    console.log("⚙️  Abriendo configuración...");
+    // 6. Abrir configuracion
+    console.log("  Abriendo configuracion...");
     const btnConfig = await waitForVisible(page, "#btn-open-config", 20000);
     await btnConfig.click();
     await page.waitForTimeout(1500);
 
     // 7. Configurar fixer
-    console.log("📝 Configurando fixer...");
+    console.log(" Configurando fixer...");
     await page.waitForSelector("#input-monto", { state: "visible" });
     await page.fill("#input-monto", "0");
     await page.waitForTimeout(300);
@@ -196,20 +196,20 @@ test.describe("Performance: Tiempo de entrega del correo", () => {
     await page.fill("#input-fixer-numero", "59164844552");
     await page.waitForTimeout(300);
 
-    console.log("💾 Guardando configuración...");
+    console.log(" Guardando configuracion...");
     await page.click("#btn-guardar-fixer");
     await page.waitForTimeout(2000);
 
-    // 8. ⏱️ INICIAR MEDICIÓN - Recargar wallet
-    console.log("\n⏱️  ========== INICIANDO MEDICIÓN ==========");
-    console.log("💳 Recargando wallet...");
+    // 8. INICIAR MEDICION
+    console.log("\n  ========== INICIANDO MEDICION ==========");
+    console.log(" Recargando wallet...");
     
     const startTime = Date.now();
-    console.log(`🕐 Timestamp inicio: ${startTime}`);
+    console.log(` Timestamp inicio: ${startTime}`);
     
     await page.click("#btn-recargar-wallet");
     
-    console.log("📩 Esperando correo (máx 10 segundos)...\n");
+    console.log(" Esperando correo (max 10 segundos)...\n");
 
     // Esperar sin bloquear para que el correo llegue mientras cerramos modales
     await page.waitForTimeout(1000);
@@ -238,7 +238,7 @@ test.describe("Performance: Tiempo de entrega del correo", () => {
         10000 // Máx 10 segundos de espera
       );
     } catch (error: any) {
-      console.error("❌ ERROR:", error.message);
+      console.error(" ERROR:", error.message);
       await page.screenshot({
         path: `error-timeout-${Date.now()}.png`,
         fullPage: true,
@@ -246,24 +246,24 @@ test.describe("Performance: Tiempo de entrega del correo", () => {
       throw error;
     }
 
-    // 12. ⏱️ RESULTADOS DE PERFORMANCE
+    // 12. RESULTADOS DE PERFORMANCE
     const endTime = Date.now();
     const totalTime = email.elapsedMs;
 
-    console.log("\n⏱️  ========== RESULTADOS ==========");
-    console.log(`🕐 Timestamp inicio:  ${startTime}`);
-    console.log(`🕐 Timestamp llegada: ${email.receivedAt}`);
-    console.log(`⏱️  Tiempo total:      ${totalTime}ms`);
-    console.log(`✅ Correo recibido en: ${(totalTime / 1000).toFixed(2)}s`);
+    console.log("\n  ========== RESULTADOS ==========");
+    console.log(` Timestamp inicio:  ${startTime}`);
+    console.log(` Timestamp llegada: ${email.receivedAt}`);
+    console.log(`  Tiempo total:      ${totalTime}ms`);
+    console.log(` Correo recibido en: ${(totalTime / 1000).toFixed(2)}s`);
     console.log("=====================================\n");
 
-    // 13. VALIDACIÓN DE PERFORMANCE
+    // 13. VALIDACION DE PERFORMANCE
     const maxTimeMs = 5000; // 5 segundos
     
     if (totalTime <= maxTimeMs) {
-      console.log(`✅ PERFORMANCE PASS: ${totalTime}ms ≤ ${maxTimeMs}ms`);
+      console.log(` PERFORMANCE PASS: ${totalTime}ms ≤ ${maxTimeMs}ms`);
     } else {
-      console.log(`❌ PERFORMANCE FAIL: ${totalTime}ms > ${maxTimeMs}ms`);
+      console.log(` PERFORMANCE FAIL: ${totalTime}ms > ${maxTimeMs}ms`);
     }
 
     // Assertion principal de performance
@@ -272,16 +272,16 @@ test.describe("Performance: Tiempo de entrega del correo", () => {
     // 14. Validaciones del contenido (secundarias)
     const body = email.body;
 
-    console.log("\n📧 Validando contenido del correo...");
+    console.log("\n Validando contenido del correo...");
     
     expect(body).toMatch(/Hola \*?(kevin|jafet)\*?/i);
     expect(body).toContain("AVISO ACERCA DEL SALDO");
-    expect(body).toMatch(/💵\s*\*?Saldo:\*?\s*Bs\.?\s*0\.0?0?/i);
-    expect(body).toMatch(/📌\s*\*?Estado:\*?\s*Restringido/i);
+    expect(body).toMatch(/\s*\*?Saldo:\*?\s*Bs\.?\s*0\.0?0?/i);
+    expect(body).toMatch(/\s*\*?Estado:\*?\s*Restringido/i);
     expect(body).toContain("Sistema de Pagos");
 
-    console.log("✅ Contenido validado correctamente");
-    console.log("\n🎉 TEST COMPLETADO EXITOSAMENTE");
-    console.log(`📊 Resultado: Correo entregado en ${totalTime}ms (Límite: ${maxTimeMs}ms)`);
+    console.log(" Contenido validado correctamente");
+    console.log("\n TEST COMPLETADO EXITOSAMENTE");
+    console.log(` Resultado: Correo entregado en ${totalTime}ms (Limite: ${maxTimeMs}ms)`);
   });
 });
